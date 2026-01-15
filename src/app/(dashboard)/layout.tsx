@@ -1,3 +1,7 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import { auth } from "@/lib/auth";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardNavbar } from "@/modules/dashboard/ui/components/dashboard-navbar";
 import { DashboardSidebar } from "@/modules/dashboard/ui/components/dashboard-sidebar";
@@ -6,7 +10,15 @@ interface Props {
   children: React.ReactNode;
 }
 
-const Layout = ({ children }: Props) => {
+const Layout = async ({ children }: Props) => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return redirect("/sign-in");
+  }
+
   return (
     <SidebarProvider>
       <DashboardSidebar />
